@@ -11,6 +11,14 @@ days_hebrew = {
 	"Saturday": "שבת"
 }
 
+active_courses = {
+	"InfoSec": "מבוא לאבטחת מידע",
+	"Optimization": "מבוא לאופטימיזציה למדעי ה מחשב",
+	"Statistics": "סטטיסטיקה למדעי המחשב",
+	"Robot Seminar": "סמינר רובוטים",
+	"Projects": "פרוייקטים"
+}
+
 
 @dataclass
 class Task:
@@ -18,41 +26,48 @@ class Task:
 	This dataclass represents a task
 
 	Attributes:
-		description (str): What is the task.
+		task_id (int): The task ID
 		course_name (str): The name of the course the task is for.
 		day (str): The day of the week to do the task.
-		deadline_date (datetime.date): The task date of submission.
+		description (str): What is the task.
 		deadline (bool): Does the task have a deadline or not.
+		deadline_date (datetime.date): The task date of submission.
 		time_created (datetime.date): The time the task is created.
 		status (bool): Is the task done or not.
+		time_completed (datetime.date): The time when the task was completed.
 	"""
-	description: str
 	course_name: str
 	day: str
+	description: str
 	deadline_date: datetime.date
-	time_completed: datetime.date = None
 	deadline: bool = False
 	time_created: datetime.date = field(default_factory=lambda: datetime.now().time())
 	status: bool = False
+	time_completed: datetime.date = None
 	task_id: int = 0
 
 	def __post_init__(self):
 		"""
 		Post init function to check if the day is valid
 		"""
+		if self.course_name in active_courses:
+			self.course_name = self.course_name
+		else:
+			self.course_name = None
 		if self.day in days_hebrew:
 			self.day = self.day
 		else:
-			self.day = 'non_day'
+			self.day = None
 
 		if not self.deadline:
 			self.deadline_date = None
 
 	def values(self) -> tuple:
 		"""
-		:return: A tuple of the 6 parameters of a task
+		:return: A tuple of the 7 parameters of a task
 		"""
-		return self.description, self.course_name, self.day, self.deadline_date, self.deadline, self.time_created, self.status
+		return self.course_name, self.day, self.description, self.deadline, self.deadline_date, \
+			   self.time_created, self.status, self.time_completed
 
 	def update_task_id(self, task_id: int) -> None:
 		"""
@@ -105,6 +120,8 @@ class Task:
 		Convert the task to a string
 		:return: The task as a string
 		"""
-		return f"Task: {self.description}, Course: {self.course_name}, Day: {self.day}, Deadline: {self.deadline_date}, Deadline: {self.deadline}, Time created: {self.time_created}, Status: {self.status}"
+		return (f"Task: {self.description}, Course: {self.course_name}, Day: {self.day}, Deadline: {self.deadline}, "
+				f"Deadline date: {self.deadline_date}, Time created: {self.time_created}, Status: {self.status}, "
+				f"Time completed: {self.time_completed}")
 
 
