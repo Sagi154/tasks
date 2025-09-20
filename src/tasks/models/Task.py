@@ -40,34 +40,45 @@ class Task:
 	day: str
 	description: str
 	deadline_date: datetime.date
-	deadline: bool = False
-	time_created: datetime.date = field(default_factory=lambda: datetime.now().time())
+	time_completed: datetime.date
+	deadline: bool
+	time_created: datetime.date = field(default_factory=datetime.now)
 	status: bool = False
-	time_completed: datetime.date = None
 	task_id: int = 0
 
 	def __post_init__(self):
 		"""
 		Post init function to check if the day is valid
 		"""
-		if self.course_name in active_courses:
-			self.course_name = self.course_name
-		else:
-			self.course_name = None
-		if self.day in days_hebrew:
-			self.day = self.day
-		else:
-			self.day = None
-
+		# if self.course_name in active_courses:
+		# 	self.course_name = self.course_name
+		# else:
+		# 	self.course_name = None
+		# if self.day in days_hebrew:
+		# 	self.day = self.day
+		# else:
+		# 	self.day = None
 		if not self.deadline:
 			self.deadline_date = None
+		if not self.status:
+			self.time_completed = None
 
-	def values(self) -> tuple:
+	def values(self, user_id: int) -> tuple:
 		"""
-		:return: A tuple of the 7 parameters of a task
+		:return: A tuple of the 7 parameters of a task including the user id
 		"""
-		return self.course_name, self.day, self.description, self.deadline, self.deadline_date, \
-			   self.time_created, self.status, self.time_completed
+		values_tuple = (
+			user_id,
+			self.course_name,
+			self.day,
+			self.description,
+			self.deadline,
+			self.deadline_date,
+			self.time_created,
+			self.status,
+			self.time_completed
+		)
+		return values_tuple
 
 	def update_task_id(self, task_id: int) -> None:
 		"""
@@ -120,7 +131,7 @@ class Task:
 		Convert the task to a string
 		:return: The task as a string
 		"""
-		return (f"Task: {self.description}, Course: {self.course_name}, Day: {self.day}, Deadline: {self.deadline}, "
+		return (f"ID: {self.task_id}, Task: {self.description}, Course: {self.course_name}, Day: {self.day}, Deadline: {self.deadline}, "
 				f"Deadline date: {self.deadline_date}, Time created: {self.time_created}, Status: {self.status}, "
 				f"Time completed: {self.time_completed}")
 

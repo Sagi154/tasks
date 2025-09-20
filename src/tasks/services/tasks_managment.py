@@ -1,6 +1,6 @@
 from datetime import datetime
-from Task import Task
-import tasks_db as tdb
+from src.tasks.models.Task import Task
+import src.tasks.database.tasks_db as tdb
 import logging
 
 # TODO: Make logging more meaningful - log the actual changes
@@ -33,7 +33,15 @@ class Tasks:
 		:param deadline: Does the task have a deadline or not
 		"""
 		# Create a new Task object
-		task = Task(description, course_name, day, deadline_date, deadline, status)
+		task = Task(
+			course_name=course_name,
+			day=day,
+			description=description,
+			deadline=deadline,
+			deadline_date=deadline_date,
+			status=status,
+			time_completed=None
+		)
 		# Add the task to the database
 		task_id = tdb.add_new_task_to_db(user_id=self.user_id, task=task)
 		task.update_task_id(task_id)

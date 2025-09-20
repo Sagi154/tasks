@@ -8,7 +8,7 @@ CONN_DICT = {
 	'user': 'sagi1',
 	'password': 'tdbsagi'
 }
-TABLE_NAME = 'Tasks'
+TABLE_NAME = 'tasks'
 
 # TODO: Add logging to database operations
 
@@ -133,10 +133,21 @@ def add_new_task_to_db(user_id: int, task: Task) -> int:
 	:return: The task ID in the database
 	"""
 	with psycopg2.connect(**CONN_DICT) as conn:
-		command = f"""INSERT INTO {TABLE_NAME} (user_id, course_name, day, description, deadline, deadline_date, time_created, status, time_completed) 
+		command = f"""
+			INSERT INTO {TABLE_NAME} (
+				user_id,           -- from user_id parameter
+				course_name,       -- from values()[0]
+				day,              -- from values()[1]
+				description,      -- from values()[2]
+				deadline,         -- from values()[3]
+				deadline_date,    -- from values()[4]
+				time_created,     -- from values()[5]
+				status,          -- from values()[6]
+				time_completed    -- from values()[7]
+			)
 			VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING task_id;"""
 		cur = conn.cursor()
-		cur.execute(command, (user_id, ) + task.values())
+		cur.execute(command, task.values(user_id))
 		conn.commit()
 		task_id = cur.fetchone()[0]
 	return task_id
@@ -177,6 +188,6 @@ def remove_task_from_db(user_id: int, task_id: int) -> None:
 if __name__ == "__main__":
 	# Example usage
 	user_id = 1
-	task_id = 3
+	task_id = 1
 	task = get_task_from_db(user_id, task_id)
 	print(task)
