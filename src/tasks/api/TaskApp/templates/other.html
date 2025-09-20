@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Other Page{% endblock %}
+
+{%  block content %}
+    <h1>Filters</h1>
+    <p> {{ some_text | upper }}</p>
+    <p> {{ some_text | title }}</p>
+    <p> {{ some_text | replace('l', 'L')}}</p>
+    <p> {{ some_text | reverse}}</p>
+        <ul>
+            {% for item in mylist %}
+                {%  if item == "Apple" %}
+                    <li style="color : green">{{ item }}</li>
+                {%  else %}
+                    <li> {{  item }}</li>
+                {%  endif %}
+            {% endfor %}
+        </ul>
+        <p>{{ mylist}}</p>
+
+        <a href="{{ url_for('other') }}"> Other</a>
+
+{% endblock %}

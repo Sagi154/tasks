@@ -1,4 +1,4 @@
-from Task import Task
+from src.tasks.models.Task import Task
 import psycopg2
 
 CONN_DICT = {
@@ -11,6 +11,27 @@ CONN_DICT = {
 TABLE_NAME = 'Tasks'
 
 # TODO: Add logging to database operations
+
+
+def get_all_tasks_from_db() -> list[Task]:
+	"""
+	Get all tasks from the database.
+	:return: A list of Task objects
+	"""
+	tasks = []
+	with psycopg2.connect(**CONN_DICT) as conn:
+		command = f"""SELECT * FROM {TABLE_NAME};"""
+		cur = conn.cursor()
+		cur.execute(command)
+		conn.commit()
+		rows = cur.fetchall()
+		columns = [desc[0] for desc in cur.description]
+	for row in rows:
+		task_dict = dict(zip(columns, row))
+		task = Task(**task_dict)
+		if task:
+			tasks.append(task)
+	return tasks
 
 
 def get_task_from_db(user_id: int, task_id: int) -> Task:
@@ -33,6 +54,75 @@ def get_task_from_db(user_id: int, task_id: int) -> Task:
 	task_dict.pop('user_id')
 	task = Task(**task_dict)
 	return task if task else None
+
+
+def get_tasks_from_db(user_id: int) -> list[Task]:
+	"""
+	Get all tasks from the database for a specific user.
+	:param user_id: The ID of the user the tasks belong to
+	:return: A list of Task objects
+	"""
+	tasks = []
+	with psycopg2.connect(**CONN_DICT) as conn:
+		command = f"""SELECT * FROM {TABLE_NAME} WHERE user_id = %s;"""
+		cur = conn.cursor()
+		cur.execute(command, (user_id,))
+		conn.commit()
+		rows = cur.fetchall()
+		columns = [desc[0] for desc in cur.description]
+	for row in rows:
+		task_dict = dict(zip(columns, row))
+		task_dict.pop('user_id')
+		task = Task(**task_dict)
+		if task:
+			tasks.append(task)
+	return tasks
+
+def get_tasks_from_db_by_day(user_id: int, day: str) -> list[Task]:
+	"""
+	Get all tasks from the database for a specific user and day.
+	:param user_id: The ID of the user the tasks belong to
+	:param day: The day of the week to filter tasks
+	:return: A list of Task objects
+	"""
+	tasks = []
+	with psycopg2.connect(**CONN_DICT) as conn:
+		command = f"""SELECT * FROM {TABLE_NAME} WHERE user_id = %s AND day = %s;"""
+		cur = conn.cursor()
+		cur.execute(command, (user_id, day))
+		conn.commit()
+		rows = cur.fetchall()
+		columns = [desc[0] for desc in cur.description]
+	for row in rows:
+		task_dict = dict(zip(columns, row))
+		task_dict.pop('user_id')
+		task = Task(**task_dict)
+		if task:
+			tasks.append(task)
+	return tasks
+
+def get_tasks_from_db_by_course(user_id: int, course_name: str) -> list[Task]:
+	"""
+	Get all tasks from the database for a specific user and course name.
+	:param user_id: The ID of the user the tasks belong to
+	:param course_name: The course name to filter tasks
+	:return: A list of Task objects
+	"""
+	tasks = []
+	with psycopg2.connect(**CONN_DICT) as conn:
+		command = f"""SELECT * FROM {TABLE_NAME} WHERE user_id = %s AND course_name = %s;"""
+		cur = conn.cursor()
+		cur.execute(command, (user_id, course_name))
+		conn.commit()
+		rows = cur.fetchall()
+		columns = [desc[0] for desc in cur.description]
+	for row in rows:
+		task_dict = dict(zip(columns, row))
+		task_dict.pop('user_id')
+		task = Task(**task_dict)
+		if task:
+			tasks.append(task)
+	return tasks
 
 
 def add_new_task_to_db(user_id: int, task: Task) -> int:
